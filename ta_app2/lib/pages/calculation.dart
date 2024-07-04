@@ -173,6 +173,7 @@ class _CalculationPageState extends State<CalculationPage> {
                     decoration: InputDecoration(
                       labelText: 'Nutrisi',
                       hintText: 'Ppm',
+                      
                     ),
                   ),
                 ),
