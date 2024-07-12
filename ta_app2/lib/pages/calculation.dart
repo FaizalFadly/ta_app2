@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-
+import 'package:ta_app2/pages/home.dart';
 import 'package:ta_app2/pages/notification.dart';
+import 'dart:convert';
+import 'package:ta_app2/utils/api_services.dart';
 
 String predictClass(double temperature, double nutrient) {
   if (temperature >= 15 && temperature <= 30) {
@@ -27,6 +28,8 @@ class _CalculationPageState extends State<CalculationPage> {
   String prediction = "";
 
   List<NotificationItem> notifications = [];
+
+  ApiService apiService = ApiService();
 
   @override
   void initState() {
@@ -85,20 +88,20 @@ class _CalculationPageState extends State<CalculationPage> {
             child: ListBody(
               children: <Widget>[
                 Text('Makronutrisi:'),
-                Text('1. Nitrogen (N): 150-250 ppm'),
-                Text('2. Fosfor (P): 30-50 ppm'),
-                Text('3. Kalium (K): 200-300 ppm'),
-                Text('4. Kalsium (Ca): 150-200 ppm'),
-                Text('5. Magnesium (Mg): 40-70 ppm'),
-                Text('6. Sulfur (S): 50-100 ppm'),
+                Text('1. Nitrogen (N): '),
+                Text('2. Fosfor (P):  '),
+                Text('3. Kalium (K):  '),
+                Text('4. Kalsium (Ca):  '),
+                Text('5. Magnesium (Mg): '),
+                Text('6. Sulfur (S):  '),
                 SizedBox(height: 10),
                 Text('Mikronutrisi:'),
-                Text('1. Besi (Fe): 1-3 ppm'),
-                Text('2. Mangan (Mn): 0.5-1 ppm'),
-                Text('3. Boron (B): 0.5-1 ppm'),
-                Text('4. Zinc (Zn): 0.1-0.5 ppm'),
-                Text('5. Tembaga (Cu): 0.05-0.1 ppm'),
-                Text('6. Molibdenum (Mo): 0.01-0.05 ppm'),
+                Text('1. Besi (Fe):  '),
+                Text('2. Mangan (Mn):  '),
+                Text('3. Boron (B):  '),
+                Text('4. Zinc (Zn):  '),
+                Text('5. Tembaga (Cu):  '),
+                Text('6. Molibdenum (Mo):  '),
               ],
             ),
           ),
@@ -122,11 +125,10 @@ class _CalculationPageState extends State<CalculationPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(MyHomePage());
           },
         ),
         title: Text('Hydroponics Decision Tree'),
-        backgroundColor: Colors.green.shade300,
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),
@@ -160,21 +162,15 @@ class _CalculationPageState extends State<CalculationPage> {
               decoration: InputDecoration(
                 labelText: 'Suhu',
                 hintText: '°C',
-              
               ),
             ),
-            SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: nutrientController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: 'Nutrisi',
-                      hintText: 'Ppm',
-                      
-                    ),
+                    decoration: InputDecoration(labelText: 'Nutrisi'),
                   ),
                 ),
                 IconButton(
@@ -185,7 +181,7 @@ class _CalculationPageState extends State<CalculationPage> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 double temperature =
                     double.tryParse(temperatureController.text) ?? 0.0;
                 double nutrient =
@@ -194,6 +190,10 @@ class _CalculationPageState extends State<CalculationPage> {
                   prediction = predictClass(temperature, nutrient);
                   addNotification(temperature, nutrient, prediction);
                 });
+
+                // Panggil sendPrediction untuk mengirim data ke API
+                await apiService.sendPrediction(
+                    temperature, nutrient, prediction);
               },
               child: Text('Prediksi'),
             ),

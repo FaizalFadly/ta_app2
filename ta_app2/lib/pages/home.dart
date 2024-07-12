@@ -46,7 +46,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     _pageController.dispose();
-    _timer?.cancel();
     super.dispose();
   }
 
@@ -65,13 +64,9 @@ class _MyHomePageState extends State<MyHomePage> {
         preferredSize: Size.fromHeight(70.0),
         child: AppBar(
           elevation: 0,
-          backgroundColor: Colors.transparent,
           title: Row(
             children: [
-              Text(
-                'Welcome to',
-                style: TextStyle(color: Colors.white, fontSize: 40),
-              ),
+              Text('Welcome to'),
               SizedBox(width: 4),
               Image.asset(
                 'assets/other/datang.png',
@@ -80,173 +75,220 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ],
           ),
-        ),
-      ),
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xff80AF81),
-                  Color(0xff80AF81),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
+          // actions: [
+          //   IconButton(
+          //     icon: Icon(Icons.notifications),
+          //     onPressed: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //           builder: (context) => NotificationPage(
+          //             notifications: notifications,
+          //             removeNotification: removeNotification,
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ],
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(1.0),
+            child: Divider(
+              height: 1.0,
+              color: Colors.grey,
             ),
           ),
-          ListView(
-            children: [
-              SizedBox(height: 100),
-              // Center(
-              //   child: Text(
-              //     'METODE DECISION TREE\nBERBASIS MOBILE PADA SISTEM PEMBERIAN\nLARUTAN NUTRISI PADA RESERVOIR\nHIDROPONIK SAWI',
-              //     textAlign: TextAlign.center,
-              //     style: TextStyle(
-              //       color: Colors.white,
-              //       fontSize: 22,
-              //       fontWeight: FontWeight.bold,
-              //     ),
-              //   ),
-              // ),
-              SizedBox(height: 40),
-              Container(
-                width: 250,
-                height: 170,
-                margin: EdgeInsets.symmetric(horizontal: 16.0),
-                decoration: BoxDecoration(
-                  border:
-                      Border.all(style: BorderStyle.solid, color: Colors.white),
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3),
-                      blurStyle: BlurStyle.outer,
-                    ),
-                  ],
-                ),
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: _numPages,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Image.asset(
-                      'assets/other/sawi${index + 1}.png',
-                      fit: BoxFit.cover,
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: 30),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 40, vertical: 1),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: DropdownButton<String>(
-                  value: 'Device 1',
-                  icon: Icon(Icons.arrow_drop_down, color: Colors.green),
-                  onChanged: (String? newValue) {},
-                  underline: Container(),
-                  items: <String>[
-                    'Device 1',
-                    'Device 2',
-                  ].map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Row(
-                        children: [
-                          SizedBox(width: 10),
-                          Text(
-                            value,
-                            style: TextStyle(
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              SizedBox(height: 30),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildInfoCard(
-                        Icons.thermostat, 'Suhu', waterValue, Colors.red),
-                    _buildInfoCard(
-                        Icons.sunny, 'Intensi', waterValue, Colors.orange),
-                  ],
-                ),
-              ),
-              SizedBox(height: 40),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildInfoCard(Icons.water, 'Air', waterValue, Colors.blue),
-                    _buildInfoCard(
-                        Icons.water_drop, 'Nutrisi', waterValue, Colors.green),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
-    );
-  }
-
-  Widget _buildInfoCard(
-      IconData icon, String label, int value, Color iconColor) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 20),
-      width: 140,
-      height: 50,
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: Colors.black.withOpacity(0.3),
-        //     spreadRadius: 5,
-        //     blurRadius: 7,
-        //     offset: Offset(0, 3),
-        //     blurStyle: BlurStyle.outer,
-        //   ),
-        // ],
-      ),
-      child: Column(
+      body: ListView(
         children: [
-          Row(
-            children: [
-              Icon(icon, color: iconColor),
-              SizedBox(width: 10),
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
+          Container(
+            margin: EdgeInsets.only(top: 35),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Container(
+                //   height: 100,
+                //   width: 250,
+                //   decoration: BoxDecoration(
+                //     border: Border.all(style: BorderStyle.solid),
+                //     borderRadius: BorderRadius.circular(10),
+                //     boxShadow: [
+                //       BoxShadow(
+                //         color: Colors.black.withOpacity(0.3),
+                //         spreadRadius: 15,
+                //         blurRadius: 7,
+                //         offset: Offset(0, 3),
+                //         blurStyle: BlurStyle.outer,
+                //       ),
+                //     ],
+                //   ),
+                //   child: PageView(
+                //     children: [
+                //       Image.asset('assets/other/datang.png',
+                //           fit: BoxFit.contain),
+                //       Image.asset('assets/other/datang.png',
+                //           fit: BoxFit.contain),
+                //       Image.asset('assets/other/datang.png',
+                //           fit: BoxFit.contain),
+                //     ],
+                //   ),
+                // ),
+                SizedBox(height: 40),
+                Container(
+                  width: 250,
+                  height: 130,
+                  decoration: BoxDecoration(
+                    border: Border.all(style: BorderStyle.solid),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        spreadRadius: 15,
+                        blurRadius: 7,
+                        offset: Offset(0, 3),
+                        blurStyle: BlurStyle.outer,
+                      ),
+                    ],
+                  ),
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: _numPages,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Image.asset(
+                        'assets/other/sawi${index + 1}.png',
+                        fit: BoxFit.cover,
+                      );
+                    },
+                  ),
                 ),
-              ),
-              Spacer(),
-              Text(
-                '$value',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
+                SizedBox(height: 30),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 95, vertical: 1),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: DropdownButton<String>(
+                    value: 'Device 1',
+                    icon: Icon(Icons.arrow_drop_down),
+                    onChanged: (String? newValue) {},
+                    underline: Container(),
+                    items: <String>[
+                      'Device 1',
+                      'Device 2',
+                    ].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Row(
+                          children: [
+                            SizedBox(width: 10),
+                            Text(
+                              value,
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: 30),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(left: 30),
+                        width: 140,
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              spreadRadius: 15,
+                              blurRadius: 7,
+                              offset: Offset(0, 3),
+                              blurStyle: BlurStyle.outer,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                IconButton(
+                                  alignment: Alignment.topLeft,
+                                  icon: Icon(Icons.thermostat),
+                                  color: Colors.black,
+                                  onPressed: () {
+                                    print('Temperature button pressed');
+                                  },
+                                ),
+                                Text(
+                                  'Suhu ',
+                                ),
+                                SizedBox(width: 1.4),
+                                Text(
+                                  '$waterValue',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(right: 20),
+                        width: 140,
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.3),
+                              spreadRadius: 15,
+                              blurRadius: 7,
+                              offset: Offset(0, 3),
+                              blurStyle: BlurStyle.outer,
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                IconButton(
+                                  alignment: Alignment.topLeft,
+                                  icon: Icon(Icons.sunny),
+                                  color: Colors.black,
+                                  onPressed: () {
+                                    print('Intensity button pressed');
+                                  },
+                                ),
+                                Text('Nutrisi '),
+                                Text(
+                                  '$waterValue',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 40),
+              ],
+            ),
           ),
         ],
       ),

@@ -1,4 +1,7 @@
+import 'package:ta_app2/pages/calculation.dart';
+import 'package:ta_app2/pages/home.dart';
 import 'package:flutter/material.dart';
+import 'package:ta_app2/pages/notification.dart';
 
 class AddDevicePage extends StatelessWidget {
   const AddDevicePage({super.key});
@@ -12,19 +15,9 @@ class AddDevicePage extends StatelessWidget {
         preferredSize: Size.fromHeight(70.0),
         child: AppBar(
           elevation: 0,
-          backgroundColor: Colors.transparent,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
           title: Row(
             children: [
-              Text(
-                'Hidroponik',
-                style: TextStyle(color: Colors.white),
-              ),
+              Text('Hiponik'),
               SizedBox(width: 4),
               Image.asset(
                 'assets/other/datang.png',
@@ -33,123 +26,115 @@ class AddDevicePage extends StatelessWidget {
               ),
             ],
           ),
+          // actions: [
+          //   IconButton(
+          //     icon: Icon(Icons.notifications),
+          //     onPressed: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //           builder: (context) => NotificationPage(
+          //             notifications: notifications,
+          //             removeNotification: removeNotification,
+          //           ),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // ],
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(20.0),
             child: Divider(
               height: 20.0,
-              color: Colors.white,
+              color: Colors.grey,
             ),
           ),
         ),
       ),
-      body: Stack(
-        children: [
+      body: ListView(
+        children: <Widget>[
           Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xff80AF81),
-                  Color(0xff80AF81),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+            margin: EdgeInsets.only(top: 1),
+            child: Center(
+              child: Image.asset(
+                'assets/other/sensor.png',
+                width: 170,
+                height: 180,
               ),
             ),
           ),
-          ListView(
-            children: <Widget>[
-              Container(
-                margin: EdgeInsets.only(top: 100),
-                child: Center(
-                  child: Image.asset(
-                    'assets/other/sensor.png',
-                    width: 500,
-                    height: 200,
+          SizedBox(height: 2),
+          Container(
+            height: 120,
+            margin: EdgeInsets.symmetric(horizontal: 20.0),
+            padding: EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'Kamu mempunyai perangkat ?',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
                   ),
                 ),
-              ),
-              SizedBox(height: 30),
-              Container(
-                height: 150,
-                margin: EdgeInsets.symmetric(horizontal: 20.0),
-                padding: EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      spreadRadius: 5,
-                      blurRadius: 7,
-                      offset: Offset(0, 3),
-                      blurStyle: BlurStyle.outer,
-                    )
-                  ],
+                Text(
+                  'Tambahkan perangkatmu lalu mulai',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      'Kamu mempunyai perangkat?',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      'Tambahkan perangkatmu lalu mulai Sensor Kontrol.',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                Text(
+                  'Sensor Kontrol.',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
                 ),
-              ),
-              SizedBox(height: 200),
-              Container(
-                margin: EdgeInsets.only(bottom: 20.0, right: 15.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(25),
-                        ),
-                      ),
-                      padding: EdgeInsets.all(16.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          // Logika untuk menambahkan perangkat
-                        },
-                        child: Row(
-                          children: <Widget>[
-                            Icon(
-                              Icons.add,
-                              color: Colors.green,
-                            ),
-                            SizedBox(width: 5),
-                            Text(
-                              'Add Device',
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontSize: 16,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ],
+              ],
+            ),
           ),
+          SizedBox(height: 200),
+          Container(
+            margin: EdgeInsets.only(bottom: 20.0, right: 15.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(25),
+                    ),
+                  ),
+                  padding: EdgeInsets.all(20.0),
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        SizedBox(width: 3),
+                        Text(
+                          'Add Device',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );
