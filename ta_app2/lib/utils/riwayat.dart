@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 Future<void> sendPrediction(
     double temperature, double nutrient, String prediction) async {
   final response = await http.post(
-    Uri.parse('http:192.168.1.2:800/api/predictions'),
+    Uri.parse('http:192.168.1.5:8000/api/predictions'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },

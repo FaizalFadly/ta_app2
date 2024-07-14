@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:ta_app2/pages/home.dart';
 import 'package:ta_app2/pages/notification.dart';
-import 'dart:convert';
 import 'package:ta_app2/utils/api_services.dart';
 
 String predictClass(double temperature, double nutrient) {
@@ -192,8 +193,12 @@ class _CalculationPageState extends State<CalculationPage> {
                 });
 
                 // Panggil sendPrediction untuk mengirim data ke API
-                await apiService.sendPrediction(
-                    temperature, nutrient, prediction);
+                try {
+                  await apiService.sendPrediction(
+                      temperature, nutrient, prediction);
+                } catch (e) {
+                  print('Error sending prediction: $e');
+                }
               },
               child: Text('Prediksi'),
             ),
