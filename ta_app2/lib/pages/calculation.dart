@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:ta_app2/pages/home.dart';
 import 'package:ta_app2/pages/notification.dart';
 import 'package:ta_app2/utils/api_services.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 String predictClass(double temperature, double nutrient) {
   if (temperature >= 15 && temperature <= 30) {
@@ -119,6 +120,53 @@ class _CalculationPageState extends State<CalculationPage> {
     );
   }
 
+  void showPredictionNotification(String prediction) {
+    Flushbar(
+      backgroundColor: Colors.white,
+      messageText: Text(
+        prediction,
+        style: TextStyle(color: Colors.black),
+      ),
+      duration: Duration(seconds: 5),
+      flushbarPosition: FlushbarPosition.TOP,
+      mainButton: Row(
+        children: [
+          TextButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NotificationPage(
+                    notifications: notifications,
+                    removeNotification: (index) {
+                      setState(() {
+                        notifications.removeAt(index);
+                        saveNotifications();
+                      });
+                    },
+                  ),
+                ),
+              );
+            },
+            child: Text(
+              "Lihat",
+              style: TextStyle(color: Colors.blue),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              "Tutup",
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    ).show(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -192,6 +240,9 @@ class _CalculationPageState extends State<CalculationPage> {
                   addNotification(temperature, nutrient, prediction);
                 });
 
+                // Menampilkan notifikasi dengan hasil prediksi
+                showPredictionNotification(prediction);
+
                 // Panggil sendPrediction untuk mengirim data ke API
                 try {
                   await apiService.sendPrediction(
@@ -203,10 +254,10 @@ class _CalculationPageState extends State<CalculationPage> {
               child: Text('Prediksi'),
             ),
             SizedBox(height: 20),
-            Text(
-              'Prediksi: $prediction',
-              style: TextStyle(fontSize: 15),
-            ),
+            // Text(
+            //   'Prediksi: $prediction',
+            //   style: TextStyle(fontSize: 15),
+            // ),
           ],
         ),
       ),

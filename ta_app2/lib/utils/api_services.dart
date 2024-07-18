@@ -11,6 +11,7 @@ class ApiService {
         data: {
           'temperature': temperature,
           'nutrient': nutrient,
+          
           'prediction': prediction,
         },
       );
@@ -21,3 +22,4 @@ class ApiService {
     }
   }
 }
+

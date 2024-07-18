@@ -176,7 +176,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     underline: Container(),
                     items: <String>[
                       'Device 1',
-                      'Device 2',
                     ].map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -270,7 +269,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                   icon: Icon(Icons.sunny),
                                   color: Colors.black,
                                   onPressed: () {
-                                    print('Intensity button pressed');
+                                    print('Nutrisi button pressed');
                                   },
                                 ),
                                 Text('Nutrisi '),

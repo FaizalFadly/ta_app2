@@ -1,10 +1,77 @@
-import 'package:ta_app2/pages/calculation.dart';
-import 'package:ta_app2/pages/home.dart';
 import 'package:flutter/material.dart';
-import 'package:ta_app2/pages/notification.dart';
+import 'package:mqtt_client/mqtt_client.dart';
+import 'package:mqtt_client/mqtt_server_client.dart';
 
-class AddDevicePage extends StatelessWidget {
+class AddDevicePage extends StatefulWidget {
   const AddDevicePage({super.key});
+
+  @override
+  _AddDevicePageState createState() => _AddDevicePageState();
+}
+
+class _AddDevicePageState extends State<AddDevicePage> {
+  final MqttServerClient client = MqttServerClient('mqtt.example.com', '');
+
+  @override
+  void initState() {
+    super.initState();
+    _connectToMqtt();
+  }
+
+  Future<void> _connectToMqtt() async {
+    client.logging(on: true);
+    client.onConnected = _onConnected;
+    client.onDisconnected = _onDisconnected;
+    client.onSubscribed = _onSubscribed;
+    client.onSubscribeFail = _onSubscribeFail;
+    client.onUnsubscribed = _onUnsubscribed;
+
+    final connMessage = MqttConnectMessage()
+        .withClientIdentifier('flutter_client')
+        .startClean()
+        .withWillQos(MqttQos.atMostOnce);
+    client.connectionMessage = connMessage;
+
+    try {
+      await client.connect();
+    } catch (e) {
+      print('Exception: $e');
+      client.disconnect();
+    }
+  }
+
+  void _onConnected() {
+    print('Connected');
+    client.subscribe('devices/wemos1/commands', MqttQos.atMostOnce);
+  }
+
+  void _onDisconnected() {
+    print('Disconnected');
+  }
+
+  void _onSubscribed(String topic) {
+    print('Subscribed topic: $topic');
+  }
+
+  void _onSubscribeFail(String topic) {
+    print('Failed to subscribe $topic');
+  }
+
+  void _onUnsubscribed(String? topic) {
+    print('Unsubscribed topic: $topic');
+  }
+
+  void _addDevice() {
+    print('Add Device button pressed');
+    if (client.connectionStatus!.state == MqttConnectionState.connected) {
+      const pubTopic = 'devices/wemos1/commands';
+      final builder = MqttClientPayloadBuilder();
+      builder.addString('connect');
+      client.publishMessage(pubTopic, MqttQos.atMostOnce, builder.payload!);
+    } else {
+      print('MQTT client is not connected');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,22 +93,6 @@ class AddDevicePage extends StatelessWidget {
               ),
             ],
           ),
-          // actions: [
-          //   IconButton(
-          //     icon: Icon(Icons.notifications),
-          //     onPressed: () {
-          //       Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //           builder: (context) => NotificationPage(
-          //             notifications: notifications,
-          //             removeNotification: removeNotification,
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //   ),
-          // ],
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(20.0),
             child: Divider(
@@ -114,7 +165,7 @@ class AddDevicePage extends StatelessWidget {
                   ),
                   padding: EdgeInsets.all(20.0),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: _addDevice,
                     child: Row(
                       children: <Widget>[
                         Icon(
