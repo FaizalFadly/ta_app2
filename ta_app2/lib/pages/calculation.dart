@@ -30,6 +30,7 @@ class _CalculationPageState extends State<CalculationPage> {
   String prediction = "";
 
   List<NotificationItem> notifications = [];
+  int unreadNotifications = 0;
 
   ApiService apiService = ApiService();
 
@@ -45,17 +46,20 @@ class _CalculationPageState extends State<CalculationPage> {
       notifications.map<Map<String, dynamic>>((item) => item.toJson()).toList(),
     );
     await prefs.setString('notifications', encodedData);
+    await prefs.setInt('unreadNotifications', unreadNotifications);
   }
 
   Future<void> loadNotifications() async {
     final prefs = await SharedPreferences.getInstance();
     final String? encodedData = prefs.getString('notifications');
+    final int? unreadCount = prefs.getInt('unreadNotifications');
     if (encodedData != null) {
       final List<dynamic> decodedData = json.decode(encodedData);
       setState(() {
         notifications = decodedData
             .map<NotificationItem>((item) => NotificationItem.fromJson(item))
             .toList();
+        unreadNotifications = unreadCount ?? 0;
       });
     }
   }
@@ -70,12 +74,13 @@ class _CalculationPageState extends State<CalculationPage> {
       notifications.insert(
         0,
         NotificationItem(
-          title: 'Prediksi Baru',
+          title: 'Hasil Prediksi',
           message:
               'Suhu: $temperatureStr°C, Nutrisi: $nutrientStr ppm, Prediksi: $prediction',
           dateTime: DateTime.now(),
         ),
       );
+      unreadNotifications++;
       saveNotifications();
     });
   }
@@ -120,6 +125,26 @@ class _CalculationPageState extends State<CalculationPage> {
     );
   }
 
+  void showAlert(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Peringatan'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Tutup'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void showPredictionNotification(String prediction) {
     Flushbar(
       backgroundColor: Colors.white,
@@ -132,8 +157,8 @@ class _CalculationPageState extends State<CalculationPage> {
       mainButton: Row(
         children: [
           TextButton(
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => NotificationPage(
@@ -147,6 +172,10 @@ class _CalculationPageState extends State<CalculationPage> {
                   ),
                 ),
               );
+              setState(() {
+                unreadNotifications = 0;
+                saveNotifications();
+              });
             },
             child: Text(
               "Lihat",
@@ -179,24 +208,56 @@ class _CalculationPageState extends State<CalculationPage> {
         ),
         title: Text('Hydroponics Decision Tree'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NotificationPage(
-                    notifications: notifications,
-                    removeNotification: (index) {
-                      setState(() {
-                        notifications.removeAt(index);
-                        saveNotifications();
-                      });
-                    },
+          Stack(
+            children: [
+              IconButton(
+                icon: Icon(Icons.notifications),
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NotificationPage(
+                        notifications: notifications,
+                        removeNotification: (index) {
+                          setState(() {
+                            notifications.removeAt(index);
+                            saveNotifications();
+                          });
+                        },
+                      ),
+                    ),
+                  );
+                  setState(() {
+                    unreadNotifications = 0;
+                    saveNotifications();
+                  });
+                },
+              ),
+              if (unreadNotifications > 0)
+                Positioned(
+                  right: 11,
+                  top: 11,
+                  child: Container(
+                    padding: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 14,
+                      minHeight: 14,
+                    ),
+                    child: Text(
+                      '$unreadNotifications',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
-              );
-            },
+            ],
           ),
         ],
       ),
@@ -231,6 +292,11 @@ class _CalculationPageState extends State<CalculationPage> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
+                if (temperatureController.text.isEmpty ||
+                    nutrientController.text.isEmpty) {
+                  showAlert('Harap isi semua kolom.');
+                  return;
+                }
                 double temperature =
                     double.tryParse(temperatureController.text) ?? 0.0;
                 double nutrient =
@@ -240,10 +306,8 @@ class _CalculationPageState extends State<CalculationPage> {
                   addNotification(temperature, nutrient, prediction);
                 });
 
-                // Menampilkan notifikasi dengan hasil prediksi
                 showPredictionNotification(prediction);
 
-                // Panggil sendPrediction untuk mengirim data ke API
                 try {
                   await apiService.sendPrediction(
                       temperature, nutrient, prediction);

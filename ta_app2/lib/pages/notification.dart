@@ -1,5 +1,7 @@
 import 'package:ta_app2/pages/calculation.dart';
 import 'package:flutter/material.dart';
+import 'package:ta_app2/pages/detail_notifikasi.dart';
+import 'package:intl/intl.dart';
 
 class NotificationPage extends StatelessWidget {
   final List<NotificationItem> notifications;
@@ -18,6 +20,8 @@ class NotificationPage extends StatelessWidget {
         itemCount: notifications.length,
         itemBuilder: (context, index) {
           final notification = notifications[index];
+          String formattedDate =
+              DateFormat('yyyy-MM-dd').format(notification.dateTime);
           return Dismissible(
             key: Key(notification.title),
             onDismissed: (direction) {
@@ -38,12 +42,21 @@ class NotificationPage extends StatelessWidget {
                 children: [
                   Text(notification.message),
                   Text(
-                    '${notification.dateTime}',
+                    formattedDate,
                     style: TextStyle(color: Colors.grey, fontSize: 12),
                   ),
                 ],
               ),
               isThreeLine: true,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        NotificationDetailPage(notification: notification),
+                  ),
+                );
+              },
             ),
           );
         },

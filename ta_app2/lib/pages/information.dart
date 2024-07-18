@@ -11,12 +11,6 @@ class InformationPage extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(70.0),
         child: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
           elevation: 0,
           title: Row(
             children: [
@@ -65,7 +59,7 @@ class InformationPage extends StatelessWidget {
                 ),
                 SizedBox(height: 100),
                 Container(
-                  height: 370,
+                  height: 330,
                   width: 270,
                   decoration: BoxDecoration(
                     boxShadow: [
