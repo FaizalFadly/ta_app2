@@ -21,7 +21,7 @@ class NotificationPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final notification = notifications[index];
           String formattedDate =
-              DateFormat('yyyy-MM-dd').format(notification.dateTime);
+              DateFormat('yyyy-MM-dd HH:mm:').format(notification.dateTime);
           return Dismissible(
             key: Key(notification.title),
             onDismissed: (direction) {

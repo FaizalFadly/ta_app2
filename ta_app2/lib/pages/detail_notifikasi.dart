@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:ta_app2/pages/calculation.dart';
 
 class NotificationDetailPage extends StatelessWidget {
@@ -8,6 +9,9 @@ class NotificationDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String formattedDateTime =
+        DateFormat('yyyy-MM-dd HH:mm:').format(notification.dateTime);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Detail Notifikasi'),
@@ -18,7 +22,7 @@ class NotificationDetailPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Judul: ${notification.title}',
+              '${notification.title}',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
@@ -28,7 +32,7 @@ class NotificationDetailPage extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text(
-              'Tanggal: ${notification.dateTime}',
+              'Tanggal: $formattedDateTime',
               style: TextStyle(fontSize: 16),
             ),
           ],
