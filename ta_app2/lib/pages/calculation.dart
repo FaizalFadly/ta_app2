@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:ta_app2/models/notification_model.dart';
 import 'package:ta_app2/pages/home.dart';
 import 'package:ta_app2/pages/notification.dart';
-import 'package:ta_app2/utils/api_services.dart';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:ta_app2/pages/notification.dart';
+import 'package:ta_app2/utils/api_services.dart';
 
 String predictClass(double temperature, double nutrient) {
   if (temperature >= 15 && temperature <= 30) {
@@ -38,6 +40,13 @@ class _CalculationPageState extends State<CalculationPage> {
   void initState() {
     super.initState();
     loadNotifications();
+  }
+
+  Future<void> deleteNotification(int index) async {
+    setState(() {
+      notifications.removeAt(index);
+    });
+    await saveNotifications();
   }
 
   Future<void> saveNotifications() async {
@@ -74,6 +83,7 @@ class _CalculationPageState extends State<CalculationPage> {
       notifications.insert(
         0,
         NotificationItem(
+          id: DateTime.now().millisecondsSinceEpoch,
           title: 'Hasil Prediksi',
           message:
               'Suhu: $temperatureStr°C, Nutrisi: $nutrientStr ppm, Prediksi: $prediction',
@@ -169,6 +179,7 @@ class _CalculationPageState extends State<CalculationPage> {
                         saveNotifications();
                       });
                     },
+                    deleteNotification: deleteNotification,
                   ),
                 ),
               );
@@ -224,6 +235,7 @@ class _CalculationPageState extends State<CalculationPage> {
                             saveNotifications();
                           });
                         },
+                        deleteNotification: deleteNotification,
                       ),
                     ),
                   );
@@ -327,29 +339,4 @@ class _CalculationPageState extends State<CalculationPage> {
       ),
     );
   }
-}
-
-class NotificationItem {
-  final String title;
-  final String message;
-  final DateTime dateTime;
-
-  NotificationItem({
-    required this.title,
-    required this.message,
-    required this.dateTime,
-  });
-
-  Map<String, dynamic> toJson() => {
-        'title': title,
-        'message': message,
-        'dateTime': dateTime.toIso8601String(),
-      };
-
-  static NotificationItem fromJson(Map<String, dynamic> json) =>
-      NotificationItem(
-        title: json['title'],
-        message: json['message'],
-        dateTime: DateTime.parse(json['dateTime']),
-      );
 }

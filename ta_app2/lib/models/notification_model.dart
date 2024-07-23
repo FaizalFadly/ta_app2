@@ -1,35 +1,30 @@
-import 'package:flutter/material.dart';
+
 
 class NotificationItem {
+  final int id;
   final String title;
   final String message;
   final DateTime dateTime;
 
   NotificationItem({
+    required this.id,
     required this.title,
     required this.message,
     required this.dateTime,
   });
-}
 
-class NotificationModel with ChangeNotifier {
-  final List<NotificationItem> _notifications = [];
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'message': message,
+        'dateTime': dateTime.toIso8601String(),
+      };
 
-  List<NotificationItem> get notifications => List.unmodifiable(_notifications);
-
-  void addNotification(String title, String message) {
-    _notifications.add(
+  static NotificationItem fromJson(Map<String, dynamic> json) =>
       NotificationItem(
-        title: title,
-        message: message,
-        dateTime: DateTime.now(),
-      ),
-    );
-    notifyListeners();
-  }
-
-  void removeNotification(int index) {
-    _notifications.removeAt(index);
-    notifyListeners();
-  }
+        id: json['id'],
+        title: json['title'],
+        message: json['message'],
+        dateTime: DateTime.parse(json['dateTime']),
+      );
 }

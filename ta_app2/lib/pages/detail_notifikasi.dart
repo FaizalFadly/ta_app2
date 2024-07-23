@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ta_app2/models/notification_model.dart';
 import 'package:ta_app2/pages/calculation.dart';
+import 'package:ta_app2/pages/information.dart';
 
 class NotificationDetailPage extends StatelessWidget {
   final NotificationItem notification;
@@ -10,7 +12,7 @@ class NotificationDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String formattedDateTime =
-        DateFormat('yyyy-MM-dd HH:mm:').format(notification.dateTime);
+        DateFormat('yyyy-MM-dd HH:mm').format(notification.dateTime);
 
     return Scaffold(
       appBar: AppBar(
@@ -21,23 +23,30 @@ class NotificationDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '${notification.title}',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Pesan: ${notification.message}',
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Tanggal: $formattedDateTime',
-              style: TextStyle(fontSize: 16),
-            ),
+            _buildSectionContent(notification.title),
+            SizedBox(height: 20),
+            _buildSectionTitle('Pesan'),
+            _buildSectionContent(notification.message),
+            SizedBox(height: 20),
+            _buildSectionTitle('Tanggal'),
+            _buildSectionContent(formattedDateTime),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    );
+  }
+
+  Widget _buildSectionContent(String content) {
+    return Text(
+      content,
+      style: TextStyle(fontSize: 16),
     );
   }
 }

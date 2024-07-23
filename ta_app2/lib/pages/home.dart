@@ -1,3 +1,4 @@
+import 'package:ta_app2/models/notification_model.dart';
 import 'package:ta_app2/pages/calculation.dart';
 import 'package:flutter/material.dart';
 import 'package:ta_app2/pages/information.dart';
