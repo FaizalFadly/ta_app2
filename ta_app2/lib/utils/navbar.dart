@@ -20,8 +20,7 @@ class _MainPageState extends State<MainPage> {
   final routes = {
     '/home': (BuildContext context) => MyHomePage(),
     '/information': (BuildContext context) => InformationPage(),
-    '/add': (BuildContext context) => AddDevicePage(),
-    '/Calculate': (BuildContext context) => CalculationPage(),
+    '/calculate': (BuildContext context) => CalculationPage(),
   };
 
   @override
@@ -72,16 +71,6 @@ class _MainPageState extends State<MainPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.add,
-            ),
-            activeIcon: Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
-            label: 'Tambah',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
               Icons.calculate_rounded,
             ),
             activeIcon: Icon(
@@ -90,6 +79,16 @@ class _MainPageState extends State<MainPage> {
             ),
             label: 'Kalkulasi',
           ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(
+          //     Icons.add,
+          //   ),
+          //   activeIcon: Icon(
+          //     Icons.add,
+          //     color: Colors.white,
+          //   ),
+          //   label: 'Tambah',
+          // ),
         ],
       ),
     );

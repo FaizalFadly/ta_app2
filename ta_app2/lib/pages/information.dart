@@ -95,63 +95,11 @@ class InformationPage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  ' Alat dan Bahan :',
+                                  ' Tingkat kepekatan nutrisi yang dibutuhkan tanaman sawi adalah 840-1400 PPM, Sawi dapat tumbuh dengan baik pada suhu rata-rata 15-30°C',
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 14.0,
                                       fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  '* Sensor pH',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                                Text(
-                                  '* Sensor TDS',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                                Text(
-                                  '* Mikrokontroler',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  'Langkah-langkah :',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  '* Kalibrasi sensor',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                                Text(
-                                  '* Integrasi sensor dengan mikrokontroler',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12.0,
-                                  ),
-                                ),
-                                Text(
-                                  '* Implementasi algoritma Decision Tree',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 12.0,
-                                  ),
                                 ),
                               ],
                             ),

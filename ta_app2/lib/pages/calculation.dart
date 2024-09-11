@@ -6,18 +6,49 @@ import 'package:ta_app2/models/notification_model.dart';
 import 'package:ta_app2/pages/home.dart';
 import 'package:ta_app2/pages/notification.dart';
 import 'package:another_flushbar/flushbar.dart';
-import 'package:ta_app2/pages/notification.dart';
 import 'package:ta_app2/utils/api_services.dart';
 
 String predictClass(double temperature, double nutrient) {
-  if (temperature >= 15 && temperature <= 30) {
-    if (nutrient >= 840 && nutrient <= 1400) {
-      return "baik: Suhu dan tingkat nutrisi optimal untuk pertumbuhan Sawi.";
+  // Jika nutrisi tidak dalam kisaran optimal
+  if (nutrient < 840 || nutrient > 1400) {
+    if (nutrient < 840) {
+      if (temperature < 15) {
+        return "Buruk: Suhu rendah dan tingkat nutrisi rendah, tidak optimal untuk pertumbuhan Sawi.";
+      } else if (temperature >= 15 && temperature <= 30) {
+        return "Buruk: Nutrisi rendah, tidak optimal untuk pertumbuhan Sawi.";
+      } else {
+        return "Buruk: Suhu tinggi dan tingkat nutrisi rendah, tidak optimal untuk pertumbuhan Sawi.";
+      }
     } else {
-      return "buruk: Tingkat nutrisi tidak berada dalam kisaran optimal 840-1400 PPM.";
+      // nutrient > 1400
+      if (temperature < 15) {
+        return "Buruk: Suhu rendah dan tingkat nutrisi tinggi, tidak optimal untuk pertumbuhan Sawi.";
+      } else if (temperature >= 15 && temperature <= 30) {
+        return "Buruk: Nutrisi tinggi, tidak optimal untuk pertumbuhan Sawi.";
+      } else {
+        return "Buruk: Suhu tinggi dan tingkat nutrisi tinggi, tidak optimal untuk pertumbuhan Sawi.";
+      }
     }
-  } else {
-    return "buruk: Suhu tidak berada dalam kisaran optimal 15-30°C.";
+  }
+  // Jika nutrisi dalam kisaran optimal
+  else if (nutrient >= 840 && nutrient <= 1400) {
+    if (temperature < 15) {
+      return "Buruk: Suhu rendah, tidak optimal untuk pertumbuhan Sawi.";
+    } else if (temperature >= 15 && temperature <= 30) {
+      if (nutrient < 900) {
+        return "Baik: Suhu optimal, namun tingkat nutrisi mendekati batas bawah.";
+      } else if (nutrient > 1300) {
+        return "Baik: Suhu optimal, namun tingkat nutrisi mendekati batas atas.";
+      } else {
+        return "Baik: Suhu dan tingkat nutrisi optimal untuk pertumbuhan Sawi.";
+      }
+    } else {
+      return "Buruk: Suhu tinggi, tidak optimal untuk pertumbuhan Sawi.";
+    }
+  }
+  // Jika suhu tidak dalam kisaran optimal
+  else {
+    return "Buruk: Suhu tidak berada dalam kisaran optimal 15-30°C.";
   }
 }
 
@@ -30,6 +61,7 @@ class _CalculationPageState extends State<CalculationPage> {
   TextEditingController temperatureController = TextEditingController();
   TextEditingController nutrientController = TextEditingController();
   String prediction = "";
+  String sensorId = '';
 
   List<NotificationItem> notifications = [];
   int unreadNotifications = 0;
@@ -40,6 +72,21 @@ class _CalculationPageState extends State<CalculationPage> {
   void initState() {
     super.initState();
     loadNotifications();
+    loadParameters();
+  }
+
+  Future<void> loadParameters() async {
+    final prefs = await SharedPreferences.getInstance();
+    double? temperature = prefs.getDouble('temperature');
+    double? nutrient = prefs.getDouble('nutrient');
+    int? id_sensor = prefs.getInt('id');
+
+    if (temperature != null && nutrient != null) {
+      temperatureController.text = formatNumber(temperature);
+      nutrientController.text = formatNumber(nutrient);
+      prediction = predictClass(temperature, nutrient);
+      setState(() {});
+    }
   }
 
   Future<void> deleteNotification(int index) async {
@@ -73,17 +120,20 @@ class _CalculationPageState extends State<CalculationPage> {
     }
   }
 
-  void addNotification(double temperature, double nutrient, String prediction) {
-    String temperatureStr = temperature
-        .toStringAsFixed(temperature.truncateToDouble() == temperature ? 0 : 1);
-    String nutrientStr = nutrient
-        .toStringAsFixed(nutrient.truncateToDouble() == nutrient ? 0 : 1);
+  String formatNumber(double value) {
+    return value % 1 == 0 ? value.toInt().toString() : value.toStringAsFixed(1);
+  }
+
+  void addNotification(
+      int id, double temperature, double nutrient, String prediction) {
+    String temperatureStr = formatNumber(temperature);
+    String nutrientStr = formatNumber(nutrient);
 
     setState(() {
       notifications.insert(
         0,
         NotificationItem(
-          id: DateTime.now().millisecondsSinceEpoch,
+          id: id,
           title: 'Hasil Prediksi',
           message:
               'Suhu: $temperatureStr°C, Nutrisi: $nutrientStr ppm, Prediksi: $prediction',
@@ -179,7 +229,6 @@ class _CalculationPageState extends State<CalculationPage> {
                         saveNotifications();
                       });
                     },
-                    deleteNotification: deleteNotification,
                   ),
                 ),
               );
@@ -211,64 +260,57 @@ class _CalculationPageState extends State<CalculationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pop(MyHomePage());
-          },
-        ),
         title: Text('Hydroponics Decision Tree'),
         actions: [
           Stack(
             children: [
-              IconButton(
-                icon: Icon(Icons.notifications),
-                onPressed: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NotificationPage(
-                        notifications: notifications,
-                        removeNotification: (index) {
-                          setState(() {
-                            notifications.removeAt(index);
-                            saveNotifications();
-                          });
-                        },
-                        deleteNotification: deleteNotification,
-                      ),
-                    ),
-                  );
-                  setState(() {
-                    unreadNotifications = 0;
-                    saveNotifications();
-                  });
-                },
-              ),
-              if (unreadNotifications > 0)
-                Positioned(
-                  right: 11,
-                  top: 11,
-                  child: Container(
-                    padding: EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    constraints: BoxConstraints(
-                      minWidth: 14,
-                      minHeight: 14,
-                    ),
-                    child: Text(
-                      '$unreadNotifications',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 8,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ),
+              // IconButton(
+              //   icon: Icon(Icons.notifications),
+              //   onPressed: () async {
+              //     await Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => NotificationPage(
+              //           notifications: notifications,
+              //           removeNotification: (index) {
+              //             setState(() {
+              //               notifications.removeAt(index);
+              //               saveNotifications();
+              //             });
+              //           },
+              //         ),
+              //       ),
+              //     );
+              //     setState(() {
+              //       unreadNotifications = 0;
+              //       saveNotifications();
+              //     });
+              //   },
+              // ),
+              // if (unreadNotifications > 0)
+              //   Positioned(
+              //     right: 11,
+              //     top: 11,
+              //     child: Container(
+              //       padding: EdgeInsets.all(2),
+              //       decoration: BoxDecoration(
+              //         color: Colors.red,
+              //         borderRadius: BorderRadius.circular(6),
+              //       ),
+              //       constraints: BoxConstraints(
+              //         minWidth: 14,
+              //         minHeight: 14,
+              //       ),
+              //       child: Text(
+              //         '$unreadNotifications',
+              //         style: TextStyle(
+              //           color: Colors.white,
+              //           fontSize: 8,
+              //         ),
+              //         textAlign: TextAlign.center,
+              //       ),
+              //     ),
+              //   ),
             ],
           ),
         ],
@@ -313,27 +355,46 @@ class _CalculationPageState extends State<CalculationPage> {
                     double.tryParse(temperatureController.text) ?? 0.0;
                 double nutrient =
                     double.tryParse(nutrientController.text) ?? 0.0;
-                setState(() {
-                  prediction = predictClass(temperature, nutrient);
-                  addNotification(temperature, nutrient, prediction);
-                });
+                prediction = predictClass(temperature, nutrient);
 
-                showPredictionNotification(prediction);
+                print('Sending data with Sensor ID: $sensorId');
 
                 try {
-                  await apiService.sendPrediction(
-                      temperature, nutrient, prediction);
+                  int? id = await apiService.sendPrediction(
+                    sensorId,
+                    temperature,
+                    nutrient,
+                    prediction,
+                  );
+
+                  if (id != null) {
+                    setState(() {
+                      addNotification(id, temperature, nutrient, prediction);
+                    });
+
+                    await apiService.sendNotification(
+                      'Hasil Prediksi',
+                      'Suhu: ${formatNumber(temperature)}°C, Nutrisi: ${formatNumber(nutrient)} ppm, Prediksi: $prediction',
+                      DateTime.now().toIso8601String(),
+                    );
+
+                    showPredictionNotification(prediction);
+                  } else {
+                    showAlert('Gagal mengirim prediksi.');
+                  }
                 } catch (e) {
                   print('Error sending prediction: $e');
+                  showAlert('Terjadi kesalahan saat mengirim prediksi.');
                 }
               },
               child: Text('Prediksi'),
             ),
             SizedBox(height: 20),
-            // Text(
-            //   'Prediksi: $prediction',
-            //   style: TextStyle(fontSize: 15),
-            // ),
+
+            Text(
+              'Penilaian: $prediction',
+              style: TextStyle(fontSize: 15),
+            ),
           ],
         ),
       ),

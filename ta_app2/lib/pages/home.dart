@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'package:ta_app2/models/notification_model.dart';
 import 'package:ta_app2/pages/calculation.dart';
-import 'package:flutter/material.dart';
 import 'package:ta_app2/pages/information.dart';
+import 'package:flutter/material.dart';
 import 'package:ta_app2/pages/notification.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -17,6 +20,11 @@ class _MyHomePageState extends State<MyHomePage> {
   int _currentPageIndex = 0;
   final int _numPages = 3;
   Timer? _timer;
+  late String sensorId;
+  double temperature = 0;
+  double nutrient = 0;
+  bool isSendDataButtonVisible =
+      false; // Variabel untuk mengatur visibilitas button
 
   @override
   void initState() {
@@ -44,6 +52,59 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> _fetchSensorData() async {
+    try {
+      final response = await http
+          .get(Uri.parse('https://hidroponik.barierrgate.my.id/api.php'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data.isNotEmpty) {
+          setState(() {
+            temperature =
+                data[0]['suhu'] != null ? double.parse(data[0]['suhu']) : 0;
+            nutrient =
+                data[0]['ppm'] != null ? double.parse(data[0]['ppm']) : 0;
+            sensorId = data[0]['id']; // Menyimpan ID dari data sensor
+            print('Sensor ID: $sensorId'); // Print ID sensor
+            isSendDataButtonVisible = temperature > 0 && nutrient > 0;
+          });
+        } else {
+          setState(() {
+            temperature = 0;
+            nutrient = 0;
+            isSendDataButtonVisible = false;
+          });
+        }
+      } else {
+        throw Exception('Failed to load sensor data');
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> _sendData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('temperature', temperature);
+    await prefs.setDouble('nutrient', nutrient);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CalculationPage(),
+      ),
+    );
+  }
+
+  String _formatValue(double value) {
+    if (value % 1 == 0) {
+      return value.toStringAsFixed(0);
+    } else {
+      return value.toStringAsFixed(1);
+    }
+  }
+
   @override
   void dispose() {
     _pageController.dispose();
@@ -52,11 +113,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    List<NotificationItem> notifications = [];
-    void removeNotification(int index) {}
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-    final int waterValue = 0;
+    final mediaQueryData = MediaQuery.of(context);
+    final screenWidth = mediaQueryData.size.width;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -76,22 +134,6 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ],
           ),
-          // actions: [
-          //   IconButton(
-          //     icon: Icon(Icons.notifications),
-          //     onPressed: () {
-          //       Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //           builder: (context) => NotificationPage(
-          //             notifications: notifications,
-          //             removeNotification: removeNotification,
-          //           ),
-          //         ),
-          //       );
-          //     },
-          //   ),
-          // ],
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(1.0),
             child: Divider(
@@ -108,33 +150,6 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Container(
-                //   height: 100,
-                //   width: 250,
-                //   decoration: BoxDecoration(
-                //     border: Border.all(style: BorderStyle.solid),
-                //     borderRadius: BorderRadius.circular(10),
-                //     boxShadow: [
-                //       BoxShadow(
-                //         color: Colors.black.withOpacity(0.3),
-                //         spreadRadius: 15,
-                //         blurRadius: 7,
-                //         offset: Offset(0, 3),
-                //         blurStyle: BlurStyle.outer,
-                //       ),
-                //     ],
-                //   ),
-                //   child: PageView(
-                //     children: [
-                //       Image.asset('assets/other/datang.png',
-                //           fit: BoxFit.contain),
-                //       Image.asset('assets/other/datang.png',
-                //           fit: BoxFit.contain),
-                //       Image.asset('assets/other/datang.png',
-                //           fit: BoxFit.contain),
-                //     ],
-                //   ),
-                // ),
                 SizedBox(height: 40),
                 Container(
                   width: 250,
@@ -197,13 +212,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 SizedBox(height: 30),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  padding: EdgeInsets.symmetric(horizontal: 25),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
                         margin: EdgeInsets.only(left: 30),
-                        width: 140,
+                        width: 130,
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -222,20 +237,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           children: [
                             Row(
                               children: [
-                                IconButton(
-                                  alignment: Alignment.topLeft,
-                                  icon: Icon(Icons.thermostat),
-                                  color: Colors.black,
-                                  onPressed: () {
-                                    print('Temperature button pressed');
-                                  },
-                                ),
+                                Icon(Icons.thermostat),
                                 Text(
                                   'Suhu ',
+                                  style: TextStyle(fontSize: 16),
                                 ),
-                                SizedBox(width: 1.4),
                                 Text(
-                                  '$waterValue',
+                                  _formatValue(temperature),
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -244,8 +252,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(right: 20),
-                        width: 140,
+                        margin: EdgeInsets.only(right: 35),
+                        width: 120,
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -265,17 +273,13 @@ class _MyHomePageState extends State<MyHomePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
-                                IconButton(
-                                  alignment: Alignment.topLeft,
-                                  icon: Icon(Icons.sunny),
-                                  color: Colors.black,
-                                  onPressed: () {
-                                    print('Nutrisi button pressed');
-                                  },
-                                ),
-                                Text('Nutrisi '),
+                                Icon(Icons.sunny),
                                 Text(
-                                  '$waterValue',
+                                  'Nutrisi ',
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  _formatValue(nutrient),
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -284,6 +288,20 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                     ],
+                  ),
+                ),
+                SizedBox(height: 35),
+                ElevatedButton(
+                  onPressed: _fetchSensorData,
+                  child: Text('Ambil Data'),
+                ),
+                SizedBox(height: 20),
+                // Button baru untuk mengirim data
+                Visibility(
+                  visible: isSendDataButtonVisible,
+                  child: ElevatedButton(
+                    onPressed: _sendData,
+                    child: Text('Kirim Data'),
                   ),
                 ),
                 SizedBox(height: 40),

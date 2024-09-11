@@ -1,5 +1,3 @@
-
-
 class NotificationItem {
   final int id;
   final String title;
@@ -13,18 +11,21 @@ class NotificationItem {
     required this.dateTime,
   });
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'message': message,
-        'dateTime': dateTime.toIso8601String(),
-      };
+  factory NotificationItem.fromJson(Map<String, dynamic> json) {
+    return NotificationItem(
+      id: json['id'],
+      title: json['title'],
+      message: json['message'],
+      dateTime: DateTime.parse(json['dateTime']),
+    );
+  }
 
-  static NotificationItem fromJson(Map<String, dynamic> json) =>
-      NotificationItem(
-        id: json['id'],
-        title: json['title'],
-        message: json['message'],
-        dateTime: DateTime.parse(json['dateTime']),
-      );
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'message': message,
+      'dateTime': dateTime.toIso8601String(),
+    };
+  }
 }
